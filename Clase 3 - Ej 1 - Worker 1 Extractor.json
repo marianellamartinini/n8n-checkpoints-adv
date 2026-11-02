@@ -1,0 +1,280 @@
+{
+  "name": "Clase 3 - Ej 1 - Worker 1 Extractor",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ 'Mensaje a analizar: ' + $json.texto_original }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Sos un extractor de datos.\n\nExtraé del mensaje del cliente:\n- nombre_cliente\n- email_cliente\n- empresa\n- nivel_urgencia\n\nReglas:\n- No inventes datos.\n- Si no aparece el nombre, email o empresa, devolvé una cadena vacía \"\".\n- Para nivel_urgencia usá ALTA, MEDIA o BAJA solamente si el mensaje permite determinarlo.\n- Si no se puede determinar la urgencia, devolvé NO_INFORMADA.\n- Entregá los cuatro campos mediante el formato estructurado conectado.\n- No agregues explicaciones."
+        }
+      },
+      "id": "2361b7e0-627f-4681-ad1f-d24adc958fd4",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        416
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"nombre_cliente\": {\n      \"type\": \"string\"\n    },\n    \"email_cliente\": {\n      \"type\": \"string\"\n    },\n    \"empresa\": {\n      \"type\": \"string\"\n    },\n    \"nivel_urgencia\": {\n      \"type\": \"string\",\n      \"enum\": [\"ALTA\", \"MEDIA\", \"BAJA\", \"NO_INFORMADA\"]\n    }\n  },\n  \"required\": [\n    \"nombre_cliente\",\n    \"email_cliente\",\n    \"empresa\",\n    \"nivel_urgencia\"\n  ],\n  \"additionalProperties\": false\n}"
+      },
+      "id": "f805479a-dc51-4b74-92cc-545a9834f791",
+      "name": "Contrato de extracción",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Worker 1 · Extractor\nSaca del mensaje los **datos duros** del cliente: nombre, email, empresa y urgencia. En la Clase 3 esos datos van a parar a columnas fijas de Airtable: son los hechos que vale la pena recordar.",
+        "height": 162,
+        "width": 972,
+        "color": 5
+      },
+      "id": "46357939-206d-41ef-b4c6-85e8b986c00c",
+      "name": "Nota",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 1 · Contrato de entrada\nEl Manager manda `texto_original`, `user_session_id`, `intencion` y `confidence`. Nada más.",
+        "height": 640,
+        "width": 296,
+        "color": 7
+      },
+      "id": "b517396c-4c41-4f51-8e4f-4774eafad751",
+      "name": "1 · Entrada",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 2 · Extraer\nUn agente sin herramientas con un **Structured Output Parser**: devuelve los cuatro datos ya validados contra un esquema, sin parsear texto a mano.",
+        "height": 640,
+        "width": 380,
+        "color": 6
+      },
+      "id": "749c2883-e984-4080-9f2c-a4194ae1f8de",
+      "name": "2 · Extraer",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 3 · Contrato de vuelta\nSi el agente no pudo devolver los datos con ese formato, sale por su salida de *error*: el Manager siempre recibe `{ status, data }`.",
+        "height": 640,
+        "width": 320,
+        "color": 4
+      },
+      "id": "f90bb641-ff45-4315-b17c-f00931bd45a4",
+      "name": "3 · Contrato",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        608,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "texto_original"
+            },
+            {
+              "name": "user_session_id"
+            },
+            {
+              "name": "intencion"
+            },
+            {
+              "name": "confidence",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        416
+      ],
+      "id": "89c0f605-019a-46c8-892f-d2338733d197",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        640
+      ],
+      "id": "ee0f4ec2-c902-4b5b-abf8-a693b786478c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6B3Ie99PVeNNCWbq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7740eb01-3542-4233-9848-03db9b71d953",
+              "name": "status",
+              "value": "success",
+              "type": "string"
+            },
+            {
+              "id": "5c6d45c5-49ee-41d4-b6a5-b38b7f745897",
+              "name": "data",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        320
+      ],
+      "id": "dfcccb4f-11b0-43c0-8651-2e78869f9b66",
+      "name": "Contrato de Salida (Éxito)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c96da02f-7809-4685-8432-10de5a57e4d9",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "15542fbd-9ee4-4ae8-94cf-ba18d82ecccc",
+              "name": "data",
+              "value": "={{ {   worker: 'Extractor',   error: $json.error?.message || $json.message || 'No se pudieron extraer los datos',   sesion: $('Execute Workflow Trigger').first().json.user_session_id } }}",
+              "type": "object"
+            },
+            {
+              "id": "1b3fd947-7e78-4bd8-aa8e-881896a3a971",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        512
+      ],
+      "id": "78b67d03-d43f-4cba-85ed-7d792a3e9c08",
+      "name": "Contrato de Salida (Error)"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Contrato de extracción": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Contrato de Salida (Éxito)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Contrato de Salida (Error)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "753161c4-fddf-4172-a386-30928a3197b3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cfc2bd72af6fd35510388e6d86302690646c3221d9b3eea6490aca659f31bb04"
+  },
+  "id": "M3r3JX1BvlUgnmhm",
+  "tags": []
+}
